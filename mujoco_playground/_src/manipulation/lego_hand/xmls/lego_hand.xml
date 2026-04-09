@@ -1,0 +1,292 @@
+<mujoco model="lego_hand">
+  <compiler angle="radian" autolimits="true" meshdir="assets"/>
+
+  <option timestep="0.002" integrator="implicitfast" gravity="0 0 -9.81"/>
+
+  <custom>
+    <numeric data="30" name="max_contact_points"/>
+    <numeric data="20" name="max_geom_pairs"/>
+  </custom>
+
+  <asset>
+    <material name="black" rgba="0.2 0.2 0.2 1"/>
+    <material name="gray"  rgba="0.5 0.5 0.5 1"/>
+
+    <mesh name="palm1_part0"               file="palm1_part0.stl"/>
+    <mesh name="palm1_part1"               file="palm1_part1.stl"/>
+    <mesh name="finger_palm_servo_part0"   file="finger_palm_servo_part0.stl"/>
+    <mesh name="finger_base_servo_part0"   file="finger_base_servo_part0.stl"/>
+    <mesh name="finger_base_lever_part0"   file="finger_base_lever_part0.stl"/>
+    <mesh name="finger_grammar1_part0"     file="finger_grammar1_part0.stl"/>
+    <mesh name="finger_middle_servo_part0" file="finger_middle_servo_part0.stl"/>
+    <mesh name="finger_middle_lever_part0" file="finger_middle_lever_part0.stl"/>
+    <mesh name="finger_grammar2_part0"     file="finger_grammar2_part0.stl"/>
+    <mesh name="finger_end_servo_part0"    file="finger_end_servo_part0.stl"/>
+    <mesh name="finger_end_lever_part0"    file="finger_end_lever_part0.stl"/>
+    <mesh name="finger_tip_part0"          file="finger_tip_part0.stl"/>
+  </asset>
+
+  <default>
+    <default class="lego_hand">
+      <geom group="3" friction="0.7" solref="0.02 1.5" solimp="0.9 0.99 0.001"/>
+      <default class="visual">
+        <geom group="2" type="mesh" contype="0" conaffinity="0" density="0" material="black"/>
+      </default>
+      <default class="tip">
+        <geom size="0.007 0.008 0.01" type="box" friction="1.0 0.05 0.0002"
+          rgba=".5 .5 .5 .3"/>
+      </default>
+      <position kp="0.5" kv="0.01" inheritrange="1"/>
+      <joint damping="0.1" armature="0.001" frictionloss="0.01"/>
+
+      <default class="palm_joint">
+        <joint type="hinge" axis="0 0 1" range="-0.698 0.698" actuatorfrcrange="-10 10"/>
+      </default>
+      <default class="base_joint">
+        <joint type="hinge" axis="-0.999419 -0.034078 0" range="0 1.5708" actuatorfrcrange="-10 10"/>
+      </default>
+      <default class="middle_joint">
+        <joint type="hinge" axis="-0.999419 -0.034078 0" range="0 1.5708" actuatorfrcrange="-10 10"/>
+      </default>
+      <default class="end_joint">
+        <joint type="hinge" axis="-0.999419 -0.034088 0" range="0 1.5708" actuatorfrcrange="-10 10"/>
+      </default>
+    </default>
+  </default>
+
+  <contact>
+    <!-- filter hand_root from all non-tip finger bodies -->
+    <exclude body1="hand_root" body2="f1_finger_base"/>
+    <exclude body1="hand_root" body2="f2_finger_base"/>
+    <exclude body1="hand_root" body2="f3_finger_base"/>
+    <exclude body1="hand_root" body2="f4_finger_base"/>
+    <exclude body1="hand_root" body2="f5_finger_base"/>
+
+    <exclude body1="hand_root" body2="f1_finger_base_lever"/>
+    <exclude body1="hand_root" body2="f2_finger_base_lever"/>
+    <exclude body1="hand_root" body2="f3_finger_base_lever"/>
+    <exclude body1="hand_root" body2="f4_finger_base_lever"/>
+    <exclude body1="hand_root" body2="f5_finger_base_lever"/>
+
+    <exclude body1="hand_root" body2="f1_finger_middle_lever"/>
+    <exclude body1="hand_root" body2="f2_finger_middle_lever"/>
+    <exclude body1="hand_root" body2="f3_finger_middle_lever"/>
+    <exclude body1="hand_root" body2="f4_finger_middle_lever"/>
+    <exclude body1="hand_root" body2="f5_finger_middle_lever"/>
+
+    <!-- adjacent finger bases don't collide with each other -->
+    <exclude body1="f1_finger_base" body2="f2_finger_base"/>
+    <exclude body1="f2_finger_base" body2="f3_finger_base"/>
+    <exclude body1="f3_finger_base" body2="f4_finger_base"/>
+    <exclude body1="f4_finger_base" body2="f5_finger_base"/>
+  </contact>
+
+  <worldbody>
+    <light name="spotlight" mode="targetbodycom" target="hand_root" pos="3 0 4"/>
+    <body name="hand_root" pos="0 0 0" euler="3.14159 -0.43633 0" childclass="lego_hand">
+      <!-- palm visual meshes -->
+      <geom class="visual" mesh="palm1_part0"/>
+      <geom class="visual" mesh="palm1_part1"/>
+      <!-- palm servo housings (visual) -->
+      <geom class="visual" mesh="finger_palm_servo_part0"/>
+      <geom class="visual" pos="0.02508 0.024835 0"   quat="0.961212 0 0 -0.275811" mesh="finger_palm_servo_part0"/>
+      <geom class="visual" pos="0.041631 0.031106 0"  quat="0.763777 0 0 -0.64548"  mesh="finger_palm_servo_part0"/>
+      <geom class="visual" pos="0.052468 0.010662 0"  quat="0.578826 0 0 -0.815451" mesh="finger_palm_servo_part0"/>
+      <geom class="visual" pos="0.059325 -0.005386 0" quat="0.240321 0 0 -0.970694" mesh="finger_palm_servo_part0"/>
+      <!-- palm collision approximation -->
+      <geom name="palm_collision" type="box" size="0.035 0.04 0.015" pos="0.035 0.01 0"
+            contype="1" conaffinity="1"/>
+      <!-- grasp site at palm center, facing fingers -->
+      <site name="grasp_site" pos="0.04 0.04 -0.02" group="4"/>
+
+      <!-- Finger 1 -->
+      <body name="f1_finger_base" pos="0.01863 0.06172 -0.028">
+        <inertial pos="0 0 0" mass="0.01" diaginertia="1e-05 1e-05 1e-05"/>
+        <joint name="f1_finger_palm_joint"   class="palm_joint"/>
+        <geom class="visual" pos="-0.01863 -0.06172 0.028" mesh="finger_base_servo_part0"/>
+        <geom name="f1_bs_col" type="box" size="0.009 0.008 0.012" pos="0 0.005 0"/>
+        <body name="f1_finger_base_lever" pos="0.01709 0.00043 -0.00464">
+          <inertial pos="0 0 0" mass="0.025" diaginertia="2.5e-05 2.5e-05 2.5e-05"/>
+          <joint name="f1_finger_base_joint" class="base_joint"/>
+          <geom class="visual" pos="-0.03572 -0.06215 0.03264" mesh="finger_base_lever_part0"/>
+          <geom class="visual" pos="-0.03572 -0.06215 0.03264" mesh="finger_grammar1_part0"/>
+          <geom class="visual" pos="-0.03572 -0.06215 0.03264" mesh="finger_middle_servo_part0"/>
+          <geom name="f1_bl_col" type="box" size="0.009 0.015 0.009" pos="0 0.015 0"/>
+          <body name="f1_finger_middle_lever" pos="-0.00115 0.03147 -0.00114">
+            <inertial pos="0 0 0" mass="0.025" diaginertia="2.5e-05 2.5e-05 2.5e-05"/>
+            <joint name="f1_finger_middle_joint" class="middle_joint"/>
+            <geom class="visual" pos="-0.03457 -0.09362 0.03378" mesh="finger_middle_lever_part0"/>
+            <geom class="visual" pos="-0.03457 -0.09362 0.03378" mesh="finger_grammar2_part0"/>
+            <geom class="visual" pos="-0.03457 -0.09362 0.03378" mesh="finger_end_servo_part0"/>
+            <geom name="f1_ml_col" type="box" size="0.009 0.015 0.009" pos="0 0.015 0"/>
+            <body name="f1_finger_end_lever" pos="-0.00104 0.03148 -0.001">
+              <inertial pos="0 0 0" mass="0.015" diaginertia="1.1e-05 1.1e-05 1.1e-05"/>
+              <joint name="f1_finger_end_joint" class="end_joint"/>
+              <geom class="visual" pos="-0.03353 -0.1251 0.03478" mesh="finger_end_lever_part0"/>
+              <geom class="visual" pos="-0.03353 -0.1251 0.03478" mesh="finger_tip_part0"/>
+              <geom name="f1_tip" class="tip" pos="0 0.025 0"/>
+              <site name="f1_tip" pos="0 0.035 0" group="4"/>
+            </body>
+          </body>
+        </body>
+      </body>
+
+      <!-- Finger 2 -->
+      <body name="f2_finger_base" pos="0.0736011 0.0672866 -0.028" quat="0.961212 0 0 -0.275811">
+        <inertial pos="0 0 0" mass="0.01" diaginertia="1e-05 1e-05 1e-05"/>
+        <joint name="f2_finger_palm_joint"   class="palm_joint"/>
+        <geom class="visual" pos="-0.01863 -0.06172 0.028" mesh="finger_base_servo_part0"/>
+        <geom name="f2_bs_col" type="box" size="0.009 0.008 0.012" pos="0 0.005 0"/>
+        <body name="f2_finger_base_lever" pos="0.01709 0.00043 -0.00464">
+          <inertial pos="0 0 0" mass="0.025" diaginertia="2.5e-05 2.5e-05 2.5e-05"/>
+          <joint name="f2_finger_base_joint" class="base_joint"/>
+          <geom class="visual" pos="-0.03572 -0.06215 0.03264" mesh="finger_base_lever_part0"/>
+          <geom class="visual" pos="-0.03572 -0.06215 0.03264" mesh="finger_grammar1_part0"/>
+          <geom class="visual" pos="-0.03572 -0.06215 0.03264" mesh="finger_middle_servo_part0"/>
+          <geom name="f2_bl_col" type="box" size="0.009 0.015 0.009" pos="0 0.015 0"/>
+          <body name="f2_finger_middle_lever" pos="-0.00115 0.03147 -0.00114">
+            <inertial pos="0 0 0" mass="0.025" diaginertia="2.5e-05 2.5e-05 2.5e-05"/>
+            <joint name="f2_finger_middle_joint" class="middle_joint"/>
+            <geom class="visual" pos="-0.03457 -0.09362 0.03378" mesh="finger_middle_lever_part0"/>
+            <geom class="visual" pos="-0.03457 -0.09362 0.03378" mesh="finger_grammar2_part0"/>
+            <geom class="visual" pos="-0.03457 -0.09362 0.03378" mesh="finger_end_servo_part0"/>
+            <geom name="f2_ml_col" type="box" size="0.009 0.015 0.009" pos="0 0.015 0"/>
+            <body name="f2_finger_end_lever" pos="-0.00104 0.03148 -0.001">
+              <inertial pos="0 0 0" mass="0.015" diaginertia="1.1e-05 1.1e-05 1.1e-05"/>
+              <joint name="f2_finger_end_joint" class="end_joint"/>
+              <geom class="visual" pos="-0.03353 -0.1251 0.03478" mesh="finger_end_lever_part0"/>
+              <geom class="visual" pos="-0.03353 -0.1251 0.03478" mesh="finger_tip_part0"/>
+              <geom name="f2_tip" class="tip" pos="0 0.025 0"/>
+              <site name="f2_tip" pos="0 0.035 0" group="4"/>
+            </body>
+          </body>
+        </body>
+      </body>
+
+      <!-- Finger 3 -->
+      <body name="f3_finger_base" pos="0.105593 0.0230261 -0.028" quat="0.763777 0 0 -0.64548">
+        <inertial pos="0 0 0" mass="0.01" diaginertia="1e-05 1e-05 1e-05"/>
+        <joint name="f3_finger_palm_joint"   class="palm_joint"/>
+        <geom class="visual" pos="-0.01863 -0.06172 0.028" mesh="finger_base_servo_part0"/>
+        <geom name="f3_bs_col" type="box" size="0.009 0.008 0.012" pos="0 0.005 0"/>
+        <body name="f3_finger_base_lever" pos="0.01709 0.00043 -0.00464">
+          <inertial pos="0 0 0" mass="0.025" diaginertia="2.5e-05 2.5e-05 2.5e-05"/>
+          <joint name="f3_finger_base_joint" class="base_joint"/>
+          <geom class="visual" pos="-0.03572 -0.06215 0.03264" mesh="finger_base_lever_part0"/>
+          <geom class="visual" pos="-0.03572 -0.06215 0.03264" mesh="finger_grammar1_part0"/>
+          <geom class="visual" pos="-0.03572 -0.06215 0.03264" mesh="finger_middle_servo_part0"/>
+          <geom name="f3_bl_col" type="box" size="0.009 0.015 0.009" pos="0 0.015 0"/>
+          <body name="f3_finger_middle_lever" pos="-0.00115 0.03147 -0.00114">
+            <inertial pos="0 0 0" mass="0.025" diaginertia="2.5e-05 2.5e-05 2.5e-05"/>
+            <joint name="f3_finger_middle_joint" class="middle_joint"/>
+            <geom class="visual" pos="-0.03457 -0.09362 0.03378" mesh="finger_middle_lever_part0"/>
+            <geom class="visual" pos="-0.03457 -0.09362 0.03378" mesh="finger_grammar2_part0"/>
+            <geom class="visual" pos="-0.03457 -0.09362 0.03378" mesh="finger_end_servo_part0"/>
+            <geom name="f3_ml_col" type="box" size="0.009 0.015 0.009" pos="0 0.015 0"/>
+            <body name="f3_finger_end_lever" pos="-0.00104 0.03148 -0.001">
+              <inertial pos="0 0 0" mass="0.015" diaginertia="1.1e-05 1.1e-05 1.1e-05"/>
+              <joint name="f3_finger_end_joint" class="end_joint"/>
+              <geom class="visual" pos="-0.03353 -0.1251 0.03478" mesh="finger_end_lever_part0"/>
+              <geom class="visual" pos="-0.03353 -0.1251 0.03478" mesh="finger_tip_part0"/>
+              <geom name="f3_tip" class="tip" pos="0 0.025 0"/>
+              <site name="f3_tip" pos="0 0.035 0" group="4"/>
+            </body>
+          </body>
+        </body>
+      </body>
+
+      <!-- Finger 4 -->
+      <body name="f4_finger_base" pos="0.104586 -0.0272876 -0.028" quat="0.578826 0 0 -0.815451">
+        <inertial pos="0 0 0" mass="0.01" diaginertia="1e-05 1e-05 1e-05"/>
+        <joint name="f4_finger_palm_joint"   class="palm_joint"/>
+        <geom class="visual" pos="-0.01863 -0.06172 0.028" mesh="finger_base_servo_part0"/>
+        <geom name="f4_bs_col" type="box" size="0.009 0.008 0.012" pos="0 0.005 0"/>
+        <body name="f4_finger_base_lever" pos="0.01709 0.00043 -0.00464">
+          <inertial pos="0 0 0" mass="0.025" diaginertia="2.5e-05 2.5e-05 2.5e-05"/>
+          <joint name="f4_finger_base_joint" class="base_joint"/>
+          <geom class="visual" pos="-0.03572 -0.06215 0.03264" mesh="finger_base_lever_part0"/>
+          <geom class="visual" pos="-0.03572 -0.06215 0.03264" mesh="finger_grammar1_part0"/>
+          <geom class="visual" pos="-0.03572 -0.06215 0.03264" mesh="finger_middle_servo_part0"/>
+          <geom name="f4_bl_col" type="box" size="0.009 0.015 0.009" pos="0 0.015 0"/>
+          <body name="f4_finger_middle_lever" pos="-0.00115 0.03147 -0.00114">
+            <inertial pos="0 0 0" mass="0.025" diaginertia="2.5e-05 2.5e-05 2.5e-05"/>
+            <joint name="f4_finger_middle_joint" class="middle_joint"/>
+            <geom class="visual" pos="-0.03457 -0.09362 0.03378" mesh="finger_middle_lever_part0"/>
+            <geom class="visual" pos="-0.03457 -0.09362 0.03378" mesh="finger_grammar2_part0"/>
+            <geom class="visual" pos="-0.03457 -0.09362 0.03378" mesh="finger_end_servo_part0"/>
+            <geom name="f4_ml_col" type="box" size="0.009 0.015 0.009" pos="0 0.015 0"/>
+            <body name="f4_finger_end_lever" pos="-0.00104 0.03148 -0.001">
+              <inertial pos="0 0 0" mass="0.015" diaginertia="1.1e-05 1.1e-05 1.1e-05"/>
+              <joint name="f4_finger_end_joint" class="end_joint"/>
+              <geom class="visual" pos="-0.03353 -0.1251 0.03478" mesh="finger_end_lever_part0"/>
+              <geom class="visual" pos="-0.03353 -0.1251 0.03478" mesh="finger_tip_part0"/>
+              <geom name="f4_tip" class="tip" pos="0 0.025 0"/>
+              <site name="f4_tip" pos="0 0.035 0" group="4"/>
+            </body>
+          </body>
+        </body>
+      </body>
+
+      <!-- Finger 5 -->
+      <body name="f5_finger_base" pos="0.0716427 -0.0686688 -0.028" quat="0.240321 0 0 -0.970694">
+        <inertial pos="0 0 0" mass="0.01" diaginertia="1e-05 1e-05 1e-05"/>
+        <joint name="f5_finger_palm_joint"   class="palm_joint"/>
+        <geom class="visual" pos="-0.01863 -0.06172 0.028" mesh="finger_base_servo_part0"/>
+        <geom name="f5_bs_col" type="box" size="0.009 0.008 0.012" pos="0 0.005 0"/>
+        <body name="f5_finger_base_lever" pos="0.01709 0.00043 -0.00464">
+          <inertial pos="0 0 0" mass="0.025" diaginertia="2.5e-05 2.5e-05 2.5e-05"/>
+          <joint name="f5_finger_base_joint" class="base_joint"/>
+          <geom class="visual" pos="-0.03572 -0.06215 0.03264" mesh="finger_base_lever_part0"/>
+          <geom class="visual" pos="-0.03572 -0.06215 0.03264" mesh="finger_grammar1_part0"/>
+          <geom class="visual" pos="-0.03572 -0.06215 0.03264" mesh="finger_middle_servo_part0"/>
+          <geom name="f5_bl_col" type="box" size="0.009 0.015 0.009" pos="0 0.015 0"/>
+          <body name="f5_finger_middle_lever" pos="-0.00115 0.03147 -0.00114">
+            <inertial pos="0 0 0" mass="0.025" diaginertia="2.5e-05 2.5e-05 2.5e-05"/>
+            <joint name="f5_finger_middle_joint" class="middle_joint"/>
+            <geom class="visual" pos="-0.03457 -0.09362 0.03378" mesh="finger_middle_lever_part0"/>
+            <geom class="visual" pos="-0.03457 -0.09362 0.03378" mesh="finger_grammar2_part0"/>
+            <geom class="visual" pos="-0.03457 -0.09362 0.03378" mesh="finger_end_servo_part0"/>
+            <geom name="f5_ml_col" type="box" size="0.009 0.015 0.009" pos="0 0.015 0"/>
+            <body name="f5_finger_end_lever" pos="-0.00104 0.03148 -0.001">
+              <inertial pos="0 0 0" mass="0.015" diaginertia="1.1e-05 1.1e-05 1.1e-05"/>
+              <joint name="f5_finger_end_joint" class="end_joint"/>
+              <geom class="visual" pos="-0.03353 -0.1251 0.03478" mesh="finger_end_lever_part0"/>
+              <geom class="visual" pos="-0.03353 -0.1251 0.03478" mesh="finger_tip_part0"/>
+              <geom name="f5_tip" class="tip" pos="0 0.025 0"/>
+              <site name="f5_tip" pos="0 0.035 0" group="4"/>
+            </body>
+          </body>
+        </body>
+      </body>
+
+    </body>
+  </worldbody>
+
+  <actuator>
+    <position name="f1_finger_palm_joint_act"   joint="f1_finger_palm_joint"   class="palm_joint"   forcerange="-0.8 0.8"/>
+    <position name="f1_finger_base_joint_act"   joint="f1_finger_base_joint"   class="base_joint"   forcerange="-0.8 0.8"/>
+    <position name="f1_finger_middle_joint_act" joint="f1_finger_middle_joint" class="middle_joint" forcerange="-0.8 0.8"/>
+    <position name="f1_finger_end_joint_act"    joint="f1_finger_end_joint"    class="end_joint"    forcerange="-0.3 0.3"/>
+
+    <position name="f2_finger_palm_joint_act"   joint="f2_finger_palm_joint"   class="palm_joint"   forcerange="-0.8 0.8"/>
+    <position name="f2_finger_base_joint_act"   joint="f2_finger_base_joint"   class="base_joint"   forcerange="-0.8 0.8"/>
+    <position name="f2_finger_middle_joint_act" joint="f2_finger_middle_joint" class="middle_joint" forcerange="-0.8 0.8"/>
+    <position name="f2_finger_end_joint_act"    joint="f2_finger_end_joint"    class="end_joint"    forcerange="-0.3 0.3"/>
+
+    <position name="f3_finger_palm_joint_act"   joint="f3_finger_palm_joint"   class="palm_joint"   forcerange="-0.8 0.8"/>
+    <position name="f3_finger_base_joint_act"   joint="f3_finger_base_joint"   class="base_joint"   forcerange="-0.8 0.8"/>
+    <position name="f3_finger_middle_joint_act" joint="f3_finger_middle_joint" class="middle_joint" forcerange="-0.8 0.8"/>
+    <position name="f3_finger_end_joint_act"    joint="f3_finger_end_joint"    class="end_joint"    forcerange="-0.3 0.3"/>
+
+    <position name="f4_finger_palm_joint_act"   joint="f4_finger_palm_joint"   class="palm_joint"   forcerange="-0.8 0.8"/>
+    <position name="f4_finger_base_joint_act"   joint="f4_finger_base_joint"   class="base_joint"   forcerange="-0.8 0.8"/>
+    <position name="f4_finger_middle_joint_act" joint="f4_finger_middle_joint" class="middle_joint" forcerange="-0.8 0.8"/>
+    <position name="f4_finger_end_joint_act"    joint="f4_finger_end_joint"    class="end_joint"    forcerange="-0.3 0.3"/>
+
+    <position name="f5_finger_palm_joint_act"   joint="f5_finger_palm_joint"   class="palm_joint"   forcerange="-0.8 0.8"/>
+    <position name="f5_finger_base_joint_act"   joint="f5_finger_base_joint"   class="base_joint"   forcerange="-0.8 0.8"/>
+    <position name="f5_finger_middle_joint_act" joint="f5_finger_middle_joint" class="middle_joint" forcerange="-0.8 0.8"/>
+    <position name="f5_finger_end_joint_act"    joint="f5_finger_end_joint"    class="end_joint"    forcerange="-0.3 0.3"/>
+  </actuator>
+
+</mujoco>
