@@ -30,12 +30,12 @@ from mujoco_playground._src.manipulation.lego_hand import lego_hand_constants as
 
 def default_config() -> config_dict.ConfigDict:
     return config_dict.create(
-        ctrl_dt=0.01,
-        sim_dt=0.002,
+        ctrl_dt=0.05,
+        sim_dt=0.01,
         action_scale=0.5,
         action_repeat=1,
         ema_alpha=1.0,
-        episode_length=5000,
+        episode_length=1000,
         success_threshold=0.1,
         history_len=1,
         obs_noise=config_dict.create(
