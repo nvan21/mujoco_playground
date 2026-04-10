@@ -49,8 +49,8 @@ def default_config() -> config_dict.ConfigDict:
         ),
         reward_config=config_dict.create(
             scales=config_dict.create(
-                orientation=10.0,
-                position=0.25,
+                orientation=5.0,
+                position=0.5,
                 termination=0.0,
                 hand_pose=0.0,
                 action_rate=0.0,
