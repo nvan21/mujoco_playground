@@ -8,7 +8,9 @@ usage() {
   echo ""
   echo "Required:"
   echo "  --env_name ENV           Environment name (e.g. LeapCubeReorient)"
-  echo "  --checkpoint PATH        Path to checkpoint directory or file"
+  echo ""
+  echo "Optional (auto-detected if omitted):"
+  echo "  --checkpoint PATH        Path to checkpoint directory (default: most recent logs/<ENV>-*/checkpoints)"
   echo ""
   echo "Optional:"
   echo "  --num_videos N           Number of rollout videos to record (default: 1)"
@@ -41,9 +43,19 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [[ -z "$ENV_NAME" || -z "$CHECKPOINT" ]]; then
-  echo "Error: --env_name and --checkpoint are required."
+if [[ -z "$ENV_NAME" ]]; then
+  echo "Error: --env_name is required."
   usage
+fi
+
+if [[ -z "$CHECKPOINT" ]]; then
+  SEARCH_BASE="${LOGDIR:-$SCRIPT_DIR/logs}"
+  CHECKPOINT=$(ls -d "$SEARCH_BASE/${ENV_NAME}"-*/checkpoints 2>/dev/null | sort | tail -1)
+  if [[ -z "$CHECKPOINT" ]]; then
+    echo "Error: no checkpoint found under $SEARCH_BASE for env '$ENV_NAME'."
+    exit 1
+  fi
+  echo "Auto-selected checkpoint: $CHECKPOINT"
 fi
 
 CMD=(
