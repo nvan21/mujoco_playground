@@ -21,6 +21,16 @@ import os
 import time
 import warnings
 
+import GPUtil
+
+# Get the ID of the first available GPU (based on lowest memory/load)
+free_gpus = GPUtil.getAvailable(
+    order="memory", maxLoad=1.0, maxMemory=1.0, limit=1
+)
+if free_gpus:
+  os.environ["CUDA_VISIBLE_DEVICES"] = str(free_gpus[0])
+  print(f"Automatically selected GPU {free_gpus[0]}")
+
 from absl import app
 from absl import flags
 from absl import logging
