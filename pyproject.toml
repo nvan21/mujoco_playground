@@ -35,6 +35,7 @@ dependencies = [
     "warp-lang>=1.12",
     "orbax-checkpoint>=0.11.22",
     "tqdm",
+    "mujoco-warp>=3.7.0.1",
 ]
 keywords = ["mjx", "mujoco", "sim2real", "reinforcement learning"]
 

@@ -123,7 +123,7 @@ class DexCubeReorient(lego_hand_base.LegoHandEnv):
 
         # Randomize the cube pose.
         rng, p_rng, quat_rng = jax.random.split(rng, 3)
-        start_pos = jp.array([0.1, 0.0, 0.05]) + jax.random.uniform(
+        start_pos = jp.array([0.1, 0.0, 0.1]) + jax.random.uniform(
             p_rng, (3,), minval=-0.01, maxval=0.01
         )
         start_quat = lego_hand_base.uniform_quat(quat_rng)
