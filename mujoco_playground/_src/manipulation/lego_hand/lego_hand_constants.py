@@ -18,6 +18,7 @@ from mujoco_playground._src import mjx_env
 
 ROOT_PATH = mjx_env.ROOT_PATH / "manipulation" / "lego_hand"
 CUBE_XML = ROOT_PATH / "xmls" / "scene.xml"
+DEX_CUBE_XML = ROOT_PATH / "xmls" / "scene_dex_cube.xml"
 
 NQ = 20
 NV = 20
