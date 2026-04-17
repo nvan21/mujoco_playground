@@ -70,7 +70,7 @@ def default_config() -> config_dict.ConfigDict:
         ),
         impl="warp",
         naconmax=30 * 8192,
-        naccdmax=200,
+        # naccdmax=200,
         njmax=500,
     )
 
@@ -149,7 +149,7 @@ class DexCubeReorient(lego_hand_base.LegoHandEnv):
             mocap_quat=jp.array([goal_quat]),
             impl=self._mjx_model.impl.value,
             naconmax=self._config.naconmax,
-            naccdmax=self._config.naccdmax,
+            # naccdmax=self._config.naccdmax,
             njmax=self._config.njmax,
         )
 
