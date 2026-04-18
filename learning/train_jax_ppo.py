@@ -553,7 +553,8 @@ def main(argv):
     ]
 
   # Render and save the rollout.
-  render_every = 2
+  target_fps = 60
+  render_every = max(1, int(round(1.0 / (infer_env.dt * target_fps))))
   fps = 1.0 / infer_env.dt / render_every
   print(f"FPS for rendering: {fps}")
   scene_option = mujoco.MjvOption()
