@@ -1,6 +1,6 @@
 <mujoco model="lego_hand_scene">
-  <include file="lego_hand.xml"/>
   <include file="reorientation_cube.xml"/>
+   <include file="lego_hand.xml"/>
 
   <statistic center="0.06 0 0.05" extent="0.4" meansize="0.01"/>
 
