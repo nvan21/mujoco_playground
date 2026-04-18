@@ -1,5 +1,5 @@
 <mujoco model="lego_hand">
-  <compiler angle="radian" autolimits="true" />
+  <compiler angle="radian" meshdir="." autolimits="true" />
 
   <asset>
     <material name="black" rgba="0.2 0.2 0.2 1"/>
